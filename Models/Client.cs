@@ -1,7 +1,10 @@
-﻿namespace DIY.NetCore.Data.CRUD.Client.Controllers
+﻿using Dapper.Contrib.Extensions;
+
+namespace DIY.NetCore.Data.CRUD.Client.Models
 {
     public class Client
     {
+        [Key]
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 
-namespace DIY.NetCore.Data.CRUD.Client.Controllers
+namespace DIY.NetCore.Data.CRUD.Client.Factory
 {
     public class DbConnectionFactory : IDbConnectionFactory
     {

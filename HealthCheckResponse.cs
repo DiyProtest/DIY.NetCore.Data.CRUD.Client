@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DIY.NetCore.Data.CRUD.Client.Controllers
+namespace DIY.NetCore.Data.CRUD.Client
 {
     public class HealthCheckResponse
     {

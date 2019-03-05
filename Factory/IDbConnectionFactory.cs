@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace DIY.NetCore.Data.CRUD.Client.Controllers
+namespace DIY.NetCore.Data.CRUD.Client.Factory
 {
     public interface IDbConnectionFactory
     {

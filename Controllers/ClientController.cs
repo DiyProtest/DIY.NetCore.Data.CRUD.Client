@@ -1,122 +1,110 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dapper;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading.Tasks;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
 using System.Net;
 using DIY.NetCore.Data.CRUD.Client.Repository;
-using System.Net.Http.Headers;
+using ClientModel = DIY.NetCore.Data.CRUD.Client.Models.Client;
 
 namespace DIY.NetCore.Data.CRUD.Client.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/clients")]
     [ApiController]
     public class ClientController : ControllerBase
     {
-        private readonly ClientRepository _clientRepository;
+        private readonly IClientRepository _clientRepository;
 
-        public ClientController(ClientRepository clientRepository)
+        public ClientController(IClientRepository clientRepository)
         {
             _clientRepository = clientRepository;
         }
 
         [HttpGet]
-        [SwaggerResponse((int) HttpStatusCode.OK, Description = "Returns all clients.", Type = typeof(IEnumerable<Client>))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(InternalServerErrorResponse))]
+        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns all clients.", Type = typeof(IEnumerable<ClientModel>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(Exception))]
         public async Task<IActionResult> GetAllAsync()
         {
-            throw new NotImplementedException();
-        }
-
-        [HttpGet("{Id}")]
-        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns a Client by its Id.", Type = typeof(Client))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(InternalServerErrorResponse))]
-        public async Task<IActionResult> GetByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        [HttpGet]
-        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns all Clients that match the specified critera.", Type = typeof(IEnumerable<Client>))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(InternalServerErrorResponse))]
-        public async Task<IActionResult> SearchAsync(string property, string condition)
-        {
-            throw new NotImplementedException();
+            var response = await _clientRepository.GetAllAsync();
+            return response.Successful ? Ok(response.Result) : new ObjectResult(response.Exception);
         }
 
         [HttpPost]
         [SwaggerResponse((int)HttpStatusCode.OK, Description = "Creates a Client and returns the Id of the new Client", Type = typeof(int))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(InternalServerErrorResponse))]
-        public async Task<IActionResult> CreateAsync(Client client)
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(Exception))]
+        public async Task<IActionResult> CreateAsync(ClientModel client)
         {
-            throw new NotImplementedException();
+            var response = await _clientRepository.CreateAsync(client);
+            return response.Successful ? Ok(response.Result) : new ObjectResult(response.Exception);
         }
 
         [HttpPut]
         [SwaggerResponse((int)HttpStatusCode.OK, Description = "Updates a client.", Type = typeof(bool))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(InternalServerErrorResponse))]
-        public async Task<IActionResult> UpdateAsync(Client client)
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(Exception))]
+        public async Task<IActionResult> UpdateAsync(ClientModel client)
         {
-            throw new NotImplementedException();
+            var response = await _clientRepository.UpdateAsync(client);
+            return response.Successful ? Ok(response.Result) : new ObjectResult(response.Exception);
         }
 
         [HttpGet("{Id}")]
-        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns all clients.", Type = typeof(Client))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(InternalServerErrorResponse))]
-        public async Task<IActionResult> GetInactiveClientByIdAsync(int id)
+        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns a Client by its Id.", Type = typeof(ClientModel))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(Exception))]
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var response = await _clientRepository.GetByIdAsync(id);
+            return response.Successful ? Ok(response.Result) : new ObjectResult(response.Exception);
         }
 
-        [HttpGet]
-        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns all clients.", Type = typeof(IEnumerable<Client>))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(InternalServerErrorResponse))]
+        [HttpGet("search")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns all Clients that match the specified critera.", Type = typeof(IEnumerable<ClientModel>))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(Exception))]
+        public async Task<IActionResult> SearchAsync(string property, string condition)
+        {
+            return BadRequest("This method is not implemented yet");
+        }
+
+        [HttpGet("all/inactive")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns all inactive clients.", Type = typeof(IEnumerable<ClientModel>))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(Exception))]
         public async Task<IActionResult> GetInactiveClientsAsync()
         {
-            throw new NotImplementedException();
+            var response = await _clientRepository.GetInactiveClientsAsync();
+            return response.Successful ? Ok(response.Result) : new ObjectResult(response.Exception);
         }
 
-        [HttpPatch]
-        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns all clients.", Type = typeof(bool))]
-        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(InternalServerErrorResponse))]
+        [HttpPatch("deactiveate/{id}")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Sets a client to inactive.", Type = typeof(bool))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(Exception))]
         public async Task<IActionResult> DeactivateAsync(int id)
         {
-            throw new NotImplementedException();
+            if (id < 1)
+                return BadRequest("the requested Id doesn't exist");
+
+            var response = await _clientRepository.DeactivateAsync(id);
+            return response.Successful ? Ok(response.Result) : new ObjectResult(response.Exception);
         }
 
-        [HttpPatch]
-        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Returns all clients.", Type = typeof(bool))]
+        [HttpPatch("activeate/{id}")]
+        [SwaggerResponse((int)HttpStatusCode.OK, Description = "Sets a client to active.", Type = typeof(bool))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, Description = "Returns all clients.", Type = typeof(string))]
-[SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(InternalServerErrorResponse))]
+        [SwaggerResponse((int)HttpStatusCode.InternalServerError, Description = "An internal error has occured", Type = typeof(Exception))]
         public async Task<IActionResult> ActivateAsync(int id)
         {
             if (id < 1)
                 return BadRequest("the requested Id doesn't exist");
 
-            return null;
+            var response = await _clientRepository.ActivateAsync(id);
+            return response.Successful? Ok(response.Result) : new ObjectResult(response.Exception);
         }
 
-        [HttpGet]
-        [SwaggerResponse((int) HttpStatusCode.OK, type:typeof(HealthCheckResponse))]
-        [SwaggerResponse((int) HttpStatusCode.InternalServerError, type: typeof(InternalServerErrorResponse))]
+        [HttpGet("healthcheck")]
+        [SwaggerResponse((int)HttpStatusCode.OK, type: typeof(HealthCheckResponse))]
         public async Task<IActionResult> HealthCheck()
         {
-        try
-            {
-                var result = await _clientRepository.HealthCheck();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                var data = new InternalServerErrorResponse
-                {
-                    Exception = ex
-                };
-                return new ObjectResult(data);
-            }
+            var result = await _clientRepository.HealthCheck();
+            return Ok(result);
         }
     }
 }
