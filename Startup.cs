@@ -28,6 +28,7 @@ namespace DIY.NetCore.Data.CRUD.Client
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //services.Configure<AppSettings>();
             services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
             services.AddSingleton<IClientRepository, ClientRepository>();
         }
@@ -47,5 +48,10 @@ namespace DIY.NetCore.Data.CRUD.Client
             app.UseHttpsRedirection();
             app.UseMvc();
         }
+    }
+
+    public class AppSettings
+    {
+        public string ConnectionString { get; set; }
     }
 }
